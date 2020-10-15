@@ -21,6 +21,9 @@ let game = {
         platform: null,
         block: null
     },
+    sounds: {
+        bump: null
+    },
     init: function () {
         this.ctx = document.getElementById("mycanvas").getContext("2d");
         this.setEvents();
@@ -40,8 +43,9 @@ let game = {
     preload(callback) {
         let loaded = 0,
             required = Object.keys(this.sprites).length;
+            required += Object.keys(this.sounds).length;
 
-        const onImageLoad = () => {
+        const onAssetsLoad = () => {
             loaded += 1;
 
             if (loaded >= required) {
@@ -49,10 +53,20 @@ let game = {
             }
         };
 
+        this.preloadSprites(onAssetsLoad);
+        this.preloadAudio(onAssetsLoad);
+    },
+    preloadSprites(onAssetsLoad) {
         for (let key in this.sprites) {
             this.sprites[key] = new Image();
             this.sprites[key].src = `img/sprites/${key}.png`;
-            this.sprites[key].addEventListener('load', onImageLoad);
+            this.sprites[key].addEventListener('load', onAssetsLoad);
+        }
+    },
+    preloadAudio(onAssetsLoad) {
+        for (let key in this.sounds) {
+            this.sounds[key] = new Audio(`sounds/${key}.mp3`);
+            this.sounds[key].addEventListener('canplaythrough', onAssetsLoad, { once: true });
         }
     },
     render() {
@@ -103,6 +117,7 @@ let game = {
             if (this.ball.collide(block) && block.active) {
                 this.ball.bumpBlock(block);
                 this.addScore();
+                this.sounds.bump.play();
             };
         };
     },
@@ -206,12 +221,15 @@ game.ball = {
         if (ballLeft < worldleft) {
             this.x = 0;
             this.dx = this.velocity;
+            game.sounds.bump.play();
         } else if (ballRight > worldRight) {
             this.x = worldRight - this.width;
             this.dx = -this.velocity;
+            game.sounds.bump.play();
         } else if (ballTop < worldTop) {
             this.y = 0;
             this.dy = this.velocity;
+            game.sounds.bump.play();
         } else if (ballBottom > worldBottom) {
             game.end('Game over!');
         }
