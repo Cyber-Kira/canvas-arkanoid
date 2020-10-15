@@ -13,6 +13,22 @@ let game = {
     },
     init: function () {
         this.ctx = document.getElementById("mycanvas").getContext("2d");
+        this.setEvents();
+    },
+    setEvents() {
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'a') {
+                this.platform.dx = -this.platform.velocity;
+                this.ball.dx = -this.ball.velocity;
+            } else if (e.key === 'd') {
+                this.platform.dx = this.platform.velocity;
+                this.ball.dx = this.ball.velocity;
+            }
+        });
+        window.addEventListener('keyup', () => {
+            this.platform.dx = 0;
+            this.ball.dx = 0;
+        });
     },
     preload(callback) {
         let loaded = 0,
@@ -53,9 +69,15 @@ let game = {
             this.ctx.drawImage(this.sprites.block, block.x, block.y);
         }
     },
+    update() {
+        this.platform.move();
+        this.ball.move();
+    },
     run() {
         window.requestAnimationFrame(() => {
+            this.update();
             this.render();
+            this.run();
         });
     },
     start: function () {
@@ -68,13 +90,27 @@ let game = {
 };
 
 game.platform = {
+    velocity: 6,
+    dx: 0,
     x: 500,
-    y: 600
+    y: 600,
+    move() {
+        if (this.dx) {
+            this.x += this.dx;
+        }
+    }
 };
 
 game.ball = {
     x: 605,
-    y: 560
+    y: 560,   
+    velocity: 6,
+    dx: 0,
+    move() {
+        if (this.dx) {
+            this.x += this.dx;
+        }
+    }
 };
 
 window.addEventListener("DOMContentLoaded", () => {
