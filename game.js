@@ -1,5 +1,6 @@
 let game = {
     ctx: null,
+    platform: null,
     sprites: {
         background: null,
         ball: null,
@@ -26,8 +27,8 @@ let game = {
     },
     render() {
         this.ctx.drawImage(this.sprites.background, 0, 0);
-        this.ctx.drawImage(this.sprites.ball, 0, 0);
-        this.ctx.drawImage(this.sprites.platform, 0, 0);
+        this.ctx.drawImage(this.sprites.ball, this.ball.x, this.ball.y);
+        this.ctx.drawImage(this.sprites.platform, this.platform.x, this.platform.y);
     },
     run() {
         window.requestAnimationFrame(() => {
@@ -38,6 +39,16 @@ let game = {
         this.init();
         this.preload(() => this.run());
     }
+};
+
+game.platform = {
+    x: 200,
+    y: 300
+};
+
+game.ball = {
+    x: 300,
+    y: 260
 };
 
 window.addEventListener("DOMContentLoaded", () => {
