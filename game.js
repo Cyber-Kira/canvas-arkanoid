@@ -1,3 +1,8 @@
+const KEYS = {
+    LEFT: 'a',
+    RIGHT: 'd',
+};
+
 let game = {
     ctx: null,
     platform: null,
@@ -17,17 +22,12 @@ let game = {
     },
     setEvents() {
         window.addEventListener('keydown', (e) => {
-            if (e.key === 'a') {
-                this.platform.dx = -this.platform.velocity;
-                this.ball.dx = -this.ball.velocity;
-            } else if (e.key === 'd') {
-                this.platform.dx = this.platform.velocity;
-                this.ball.dx = this.ball.velocity;
+            if (e.key === KEYS.LEFT || e.key === KEYS.RIGHT) {
+                this.platform.start(e.key);
             }
         });
         window.addEventListener('keyup', () => {
-            this.platform.dx = 0;
-            this.ball.dx = 0;
+            this.platform.stop();
         });
     },
     preload(callback) {
@@ -71,7 +71,6 @@ let game = {
     },
     update() {
         this.platform.move();
-        this.ball.move();
     },
     run() {
         window.requestAnimationFrame(() => {
@@ -94,23 +93,27 @@ game.platform = {
     dx: 0,
     x: 500,
     y: 600,
+    start(direction) {
+        if (direction === KEYS.LEFT) {
+            this.dx = -this.velocity;
+        } else if (direction === KEYS.RIGHT) {
+            this.dx = this.velocity;
+        }
+    },
+    stop() {
+        this.dx = 0;
+    },
     move() {
         if (this.dx) {
             this.x += this.dx;
+            game.ball.x += this.dx;
         }
     }
 };
 
 game.ball = {
     x: 605,
-    y: 560,   
-    velocity: 6,
-    dx: 0,
-    move() {
-        if (this.dx) {
-            this.x += this.dx;
-        }
-    }
+    y: 560
 };
 
 window.addEventListener("DOMContentLoaded", () => {
