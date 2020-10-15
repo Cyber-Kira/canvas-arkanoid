@@ -174,7 +174,7 @@ game.ball = {
         let ballLeft = x,
             ballTop = y,
             ballRight = ballLeft + this.width,
-            ballBottom = x + this.height;
+            ballBottom = ballTop + this.height;
 
         let worldleft = 0,
             worldTop = 0,
