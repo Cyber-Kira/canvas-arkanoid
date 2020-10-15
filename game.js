@@ -6,9 +6,11 @@ const KEYS = {
 
 let game = {
     ctx: null,
+    running: true,
     platform: null,
     ball: null,
     blocks: [],
+    score: 0,
     rows: 4,
     cols: 8,
     width: 1280,
@@ -24,16 +26,15 @@ let game = {
         this.setEvents();
     },
     setEvents() {
-        window.addEventListener('keyup', (e) => {
-            this.platform.start(KEYS.RIGHT);
-            this.platform.stop();
-        });
         window.addEventListener('keydown', (e) => {
             if (e.key === KEYS.SPACE) {
                 this.platform.fire();
             } else if (e.key === KEYS.LEFT || e.key === KEYS.RIGHT) {
                 this.platform.start(e.key);
             }
+            window.addEventListener('keyup', () => {
+                this.platform.stop();
+            });
         });
     },
     preload(callback) {
@@ -90,10 +91,18 @@ let game = {
         this.collideBlocks();
         this.collidePlatform();
     },
+    addScore() {
+        this.score += 1;
+
+        if (this.score >= this.blocks.length) {
+            this.end('YOU WON!')
+        }
+    },
     collideBlocks() {
         for (let block of this.blocks) {
             if (this.ball.collide(block) && block.active) {
                 this.ball.bumpBlock(block);
+                this.addScore();
             };
         };
     },
@@ -103,11 +112,13 @@ let game = {
         }
     },
     run() {
-        window.requestAnimationFrame(() => {
-            this.update();
-            this.render();
-            this.run();
-        });
+        if (this.running) {
+            window.requestAnimationFrame(() => {
+                this.update();
+                this.render();
+                this.run();
+            });
+        }
     },
     start: function () {
         this.init();
@@ -115,6 +126,11 @@ let game = {
             this.create();
             this.run();
         });
+    },
+    end(message) {
+        this.running = false;
+        location.reload();
+        alert(message);
     },
     random(min, max) {
         return Math.floor(Math.random() * (max - min + 1) + min);
@@ -157,6 +173,7 @@ game.ball = {
         if (block) {
             block.active = false;
             this.dy *= -1;
+
         }
     },
     bumpPlatform(platform) {
@@ -196,7 +213,7 @@ game.ball = {
             this.y = 0;
             this.dy = this.velocity;
         } else if (ballBottom > worldBottom) {
-            
+            game.end('Game over!');
         }
     }
 };
