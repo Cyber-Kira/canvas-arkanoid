@@ -24,15 +24,16 @@ let game = {
         this.setEvents();
     },
     setEvents() {
+        window.addEventListener('keyup', (e) => {
+            this.platform.start(KEYS.RIGHT);
+            this.platform.stop();
+        });
         window.addEventListener('keydown', (e) => {
             if (e.key === KEYS.SPACE) {
                 this.platform.fire();
             } else if (e.key === KEYS.LEFT || e.key === KEYS.RIGHT) {
                 this.platform.start(e.key);
             }
-        });
-        window.addEventListener('keyup', () => {
-            this.platform.stop();
         });
     },
     preload(callback) {
@@ -82,6 +83,7 @@ let game = {
         }
     },
     update() {
+        this.platform.collideWorldBounds();
         this.platform.move();
         this.ball.move();
         this.ball.collideWorldBounds();
@@ -159,6 +161,9 @@ game.ball = {
     },
     bumpPlatform(platform) {
         if (platform) {
+            if (platform.dx) {
+                this.x += platform.dx;
+            }
             let touchX = this.x + (this.width / 2);
 
             if (this.dy > 0) {
@@ -168,15 +173,15 @@ game.ball = {
         }
     },
     collideWorldBounds() {
-        let x = this.x + this.dx,
+        const x = this.x + this.dx,
             y = this.y + this.dy;
 
-        let ballLeft = x,
+        const ballLeft = x,
             ballTop = y,
             ballRight = ballLeft + this.width,
             ballBottom = ballTop + this.height;
 
-        let worldleft = 0,
+        const worldleft = 0,
             worldTop = 0,
             worldRight = game.width,
             worldBottom = game.height;
@@ -191,7 +196,7 @@ game.ball = {
             this.y = 0;
             this.dy = this.velocity;
         } else if (ballBottom > worldBottom) {
-            console.log('game over');
+            
         }
     }
 };
@@ -227,12 +232,24 @@ game.platform = {
                 this.ball.x += this.dx;
             }
         }
+
     },
     getTouchOffset(x) {
         const diff = (this.x + this.width) - x,
             offset = this.width - diff,
             result = 2 * offset / this.width;
         return result - 1;
+    },
+    collideWorldBounds() {
+        const x = this.x + this.dx,
+            platformLeft = x,
+            platformRight = platformLeft + this.width,
+            worldleft = 0,
+            worldRight = game.width;
+
+        if (platformLeft < worldleft || platformRight > worldRight) {
+            this.dx = 0;
+        }
     }
 };
 
